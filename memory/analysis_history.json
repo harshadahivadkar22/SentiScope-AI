@@ -1,0 +1,66 @@
+[
+    {
+        "id": 1781212435323,
+        "timestamp": "2026-06-12T02:43:55.323077",
+        "text": "i am best",
+        "sentiment": "Positive",
+        "polarity": 1.0,
+        "subjectivity": 0.3,
+        "insights": {
+            "emotion_strength": 72,
+            "emotion_label": "High Intensity",
+            "confidence": 50,
+            "confidence_label": "Low",
+            "trend": "Improving",
+            "recommendation": "Customer appears satisfied."
+        }
+    },
+    {
+        "id": 1781212399810,
+        "timestamp": "2026-06-12T02:43:19.810418",
+        "text": "i am sleeping bexause i am not feeling well",
+        "sentiment": "Neutral",
+        "polarity": 0.0,
+        "subjectivity": 0.0,
+        "insights": {
+            "emotion_strength": 0,
+            "emotion_label": "Low Intensity",
+            "confidence": 75,
+            "confidence_label": "Medium",
+            "trend": "Declining",
+            "recommendation": "Customer sentiment is balanced."
+        }
+    },
+    {
+        "id": 1781212361124,
+        "timestamp": "2026-06-12T02:42:41.124968",
+        "text": "i am sleeping",
+        "sentiment": "Neutral",
+        "polarity": 0.0,
+        "subjectivity": 0.0,
+        "insights": {
+            "emotion_strength": 0,
+            "emotion_label": "Low Intensity",
+            "confidence": 55,
+            "confidence_label": "Low",
+            "trend": "Stable (First Run)",
+            "recommendation": "Customer sentiment is balanced."
+        }
+    },
+    {
+        "id": 1781212321558,
+        "timestamp": "2026-06-12T02:42:01.558604",
+        "text": "i am good",
+        "sentiment": "Positive",
+        "polarity": 0.7,
+        "subjectivity": 0.6,
+        "insights": {
+            "emotion_strength": 66,
+            "emotion_label": "Moderate Intensity",
+            "confidence": 50,
+            "confidence_label": "Low",
+            "trend": "Stable (First Run)",
+            "recommendation": "Customer appears satisfied."
+        }
+    }
+]

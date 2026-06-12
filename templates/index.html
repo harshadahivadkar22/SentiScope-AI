@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SentiScope AI - Advanced Sentiment Analytics Dashboard</title>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Outfit:wght@500;700;800&display=swap" rel="stylesheet">
+    <!-- Main Style Sheet -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+    <div class="app-layout">
+        <!-- Sidebar Panel: Recent Transactions & Actions -->
+        <aside class="sidebar" role="complementary">
+            <div class="sidebar-header">
+                <h2>Recent Analyses</h2>
+                <span class="history-count" id="history-counter" aria-live="polite">0 records</span>
+            </div>
+            
+            <!-- Dynamic Scrollable list of past analyses -->
+            <div class="sidebar-body" id="history-list">
+                <div class="history-empty-placeholder">
+                    <svg viewBox="0 0 24 24" width="24" height="24" stroke="currentColor" stroke-width="2" fill="none" aria-hidden="true">
+                        <circle cx="12" cy="12" r="10"></circle>
+                        <polyline points="12 6 12 12 16 14"></polyline>
+                    </svg>
+                    <p>No records found</p>
+                </div>
+            </div>
+            
+            <!-- Clear and Export sidebar footer controls -->
+            <div class="sidebar-footer">
+                <div class="footer-actions-grid">
+                    <button id="btn-export-csv" class="btn btn-secondary-outline" title="Export entire analysis history as CSV" disabled>
+                        <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                            <polyline points="7 10 12 15 17 10"></polyline>
+                            <line x1="12" y1="15" x2="12" y2="3"></line>
+                        </svg>
+                        Export CSV
+                    </button>
+                    <button id="btn-export-txt" class="btn btn-secondary-outline" title="Export visual summary statistics report as Text" disabled>
+                        <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                            <polyline points="14 2 14 8 20 8"></polyline>
+                            <line x1="12" y1="18" x2="12" y2="12"></line>
+                            <line x1="9" y1="15" x2="15" y2="15"></line>
+                        </svg>
+                        Export TXT
+                    </button>
+                    <button id="btn-clear-history" class="btn btn-danger-outline" title="Wipe transaction history JSON logs and reset server charts">
+                        <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                            <polyline points="3 6 5 6 21 6"></polyline>
+                            <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+                        </svg>
+                        Clear History
+                    </button>
+                </div>
+            </div>
+        </aside>
+
+        <!-- Main Dashboard Workspace -->
+        <main class="dashboard-container" role="main">
+            <!-- Header section -->
+            <header class="dashboard-header">
+                <div class="logo">
+                    <svg viewBox="0 0 24 24" width="28" height="28" stroke="currentColor" stroke-width="2.5" fill="none" stroke-linecap="round" stroke-linejoin="round" class="logo-icon" aria-hidden="true">
+                        <path d="M12 2a10 10 0 1 0 10 10A10 10 0 0 0 12 2zm0 18a8 8 0 1 1 8-8 8 8 0 0 1-8 8z"></path>
+                        <circle cx="12" cy="12" r="3"></circle>
+                        <path d="M12 7v2M12 15v2M7 12h2M15 12h2"></path>
+                    </svg>
+                    <h1>SentiScope <span class="accent">AI</span></h1>
+                </div>
+                <p class="subtitle">History Intelligence Console</p>
+            </header>
+
+            <!-- Workspace split grid -->
+            <div class="dashboard-grid">
+                <!-- Analysis Console input -->
+                <section class="card input-card" aria-label="Text Input Console">
+                    <div class="card-header">
+                        <h2>Analysis Console</h2>
+                        <span class="badge-console">Input</span>
+                    </div>
+                    <div class="card-body">
+                        <textarea 
+                            id="text-input" 
+                            placeholder="Type or paste your customer interaction logs here to analyze sentiment polarity, subjectivity metrics, and actionable recommendations..."
+                            maxlength="1500"
+                            aria-label="Text content for sentiment analysis"
+                        ></textarea>
+                    </div>
+                    <div class="card-footer">
+                        <button id="btn-analyze" class="btn btn-primary" aria-label="Execute sentiment analysis">
+                            <span>Analyze Sentiment</span>
+                            <svg class="loading-spinner hidden" viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="3" fill="none" aria-hidden="true">
+                                <circle cx="12" cy="12" r="10" stroke-dasharray="40 40" stroke-linecap="round"></circle>
+                            </svg>
+                        </button>
+                    </div>
+                </section>
+
+                <!-- Sentiment Results panel -->
+                <section class="results-wrapper" aria-label="Analysis Results View">
+                    <!-- Awaiting Input Placeholder State -->
+                    <div id="results-empty" class="results-empty-card">
+                        <div class="icon-glow-wrapper">
+                            <svg viewBox="0 0 24 24" width="40" height="40" stroke="currentColor" stroke-width="1.5" fill="none" class="pulse-icon" aria-hidden="true">
+                                <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path>
+                                <polyline points="3.27 6.96 12 12.01 20.73 6.96"></polyline>
+                                <line x1="12" y1="22.08" x2="12" y2="12"></line>
+                            </svg>
+                        </div>
+                        <h3>System Awaiting Data</h3>
+                        <p>Submit text in the console to evaluate classification scores, emotional indicators, and insights.</p>
+                    </div>
+
+                    <!-- Active Results Card -->
+                    <div id="results-content" class="results-active-card hidden" aria-live="polite">
+                        <!-- Prominent Sentiment category badge -->
+                        <div class="large-sentiment-card">
+                            <span class="indicator-title">Sentiment Classification</span>
+                            <div id="sentiment-badge" class="sentiment-badge">
+                                <span class="badge-dot"></span>
+                                <span id="sentiment-text" class="badge-text">NEUTRAL</span>
+                            </div>
+                        </div>
+
+                        <!-- Circular gauge indicators row -->
+                        <div class="scores-grid">
+                            <!-- Polarity SVG Gauge -->
+                            <div class="card score-card">
+                                <div class="score-card-header">
+                                    <h3>Polarity</h3>
+                                    <div class="info-tooltip" tabindex="0" aria-label="Polarity metric description: Ranges from -1.0 to +1.0">
+                                        <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none" aria-hidden="true">
+                                            <circle cx="12" cy="12" r="10"></circle>
+                                            <line x1="12" y1="16" x2="12" y2="12"></line>
+                                            <line x1="12" y1="8" x2="12.01" y2="8"></line>
+                                        </svg>
+                                        <span class="tooltip-text">Ranges from -1.0 (highly negative) to +1.0 (highly positive).</span>
+                                    </div>
+                                </div>
+                                <div class="gauge-wrapper">
+                                    <svg width="110" height="110" viewBox="0 0 100 100" class="svg-gauge" aria-hidden="true">
+                                        <circle class="gauge-track" cx="50" cy="50" r="40" stroke-width="8" fill="none"></circle>
+                                        <circle id="polarity-fill" class="gauge-fill" cx="50" cy="50" r="40" stroke-width="8" fill="none"
+                                                stroke-dasharray="251.2" stroke-dashoffset="251.2" transform="rotate(-90 50 50)"></circle>
+                                    </svg>
+                                    <div class="gauge-inner-value">
+                                        <span id="polarity-score" class="score-number">0.00</span>
+                                        <span id="polarity-lbl" class="score-label">Neutral</span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Subjectivity SVG Gauge -->
+                            <div class="card score-card">
+                                <div class="score-card-header">
+                                    <h3>Subjectivity</h3>
+                                    <div class="info-tooltip" tabindex="0" aria-label="Subjectivity metric description: Ranges from 0.0 to 1.0">
+                                        <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none" aria-hidden="true">
+                                            <circle cx="12" cy="12" r="10"></circle>
+                                            <line x1="12" y1="16" x2="12" y2="12"></line>
+                                            <line x1="12" y1="8" x2="12.01" y2="8"></line>
+                                        </svg>
+                                        <span class="tooltip-text">Ranges from 0.0 (factual objective) to 1.0 (emotional opinion).</span>
+                                    </div>
+                                </div>
+                                <div class="gauge-wrapper">
+                                    <svg width="120" height="120" viewBox="0 0 100 100" class="svg-gauge" aria-hidden="true">
+                                        <circle class="gauge-track" cx="50" cy="50" r="40" stroke-width="8" fill="none"></circle>
+                                        <circle id="subjectivity-fill" class="gauge-fill-sub" cx="50" cy="50" r="40" stroke-width="8" fill="none"
+                                                stroke-dasharray="251.2" stroke-dashoffset="251.2" transform="rotate(-90 50 50)"></circle>
+                                    </svg>
+                                    <div class="gauge-inner-value">
+                                        <span id="subjectivity-score" class="score-number">0.00</span>
+                                        <span id="subjectivity-lbl" class="score-label">Objective</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Advanced insights list -->
+                        <div class="card insights-card">
+                            <div class="card-header">
+                                <h3>Advanced Insights</h3>
+                                <span class="badge-console">Engine</span>
+                            </div>
+                            <div class="insights-body">
+                                <div class="insight-row">
+                                    <span class="insight-label">Emotion Strength</span>
+                                    <span id="insight-emotion" class="insight-value">0% (Low)</span>
+                                </div>
+                                <div class="insight-row">
+                                    <span class="insight-label">Confidence Indicator</span>
+                                    <span id="insight-confidence" class="insight-value">70% (Medium)</span>
+                                </div>
+                                <div class="insight-row">
+                                    <span class="insight-label">Sentiment Trend</span>
+                                    <span id="insight-trend" class="insight-value-trend">Stable</span>
+                                </div>
+                            </div>
+                            <div class="insights-footer">
+                                <div id="recommendation-box" class="recommendation-box">
+                                    <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2.5" fill="none" class="recommendation-icon" aria-hidden="true">
+                                        <circle cx="12" cy="12" r="10"></circle>
+                                        <line x1="12" y1="16" x2="12" y2="12"></line>
+                                        <line x1="12" y1="8" x2="12.01" y2="8"></line>
+                                    </svg>
+                                    <p id="insight-recommendation">Awaiting sentiment logs...</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            </div>
+
+            <!-- Bottom Section: Analytics charts -->
+            <section id="analytics-section" class="analytics-section hidden" aria-label="Sentiment Analytics Visualizations">
+                <div class="analytics-header">
+                    <h2>Sentiment Distribution Analytics</h2>
+                    <span class="badge-console">Charts</span>
+                </div>
+                <div class="analytics-grid">
+                    <!-- Distribution Pie Chart Card -->
+                    <div class="card chart-card">
+                        <div class="chart-image-container">
+                            <img id="chart-pie" src="" alt="Sentiment Share Percentage Pie Chart">
+                        </div>
+                    </div>
+                    <!-- Frequency Bar Chart Card -->
+                    <div class="card chart-card">
+                        <div class="chart-image-container">
+                            <img id="chart-bar" src="" alt="Sentiment Count Frequencies Bar Chart">
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <!-- Client script controller -->
+    <script src="{{ url_for('static', filename='js/script.js') }}"></script>
+</body>
+</html>
