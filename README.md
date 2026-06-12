@@ -155,7 +155,7 @@ Ensure you have Python 3.10+ installed on your system.
 
 ## ✍️ Author Information
 
-Developed with care by **Harshada Hivadkar**
+Developed with care by **Harsha Dahivadkar**
 
 * **GitHub**: [@harshadahivadkar22](https://github.com/harshadahivadkar22)
 * **Repository URL**: [https://github.com/harshadahivadkar22/SentiScope-AI](https://github.com/harshadahivadkar22/SentiScope-AI)
